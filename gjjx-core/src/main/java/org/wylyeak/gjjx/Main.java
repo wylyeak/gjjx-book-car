@@ -99,6 +99,7 @@ public class Main {
 				// logger.info(body);
 				getMethod = new GetMethod(
 						"http://www.gjjx.com.cn/index.php?m=member&c=index");
+				Thread.sleep(3000);
 				getMethod
 						.setRequestHeader("Referer",
 								"http://www.gjjx.com.cn/index.php?m=member&c=index&a=login");
