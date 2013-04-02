@@ -61,7 +61,12 @@ public class Main {
 	 */
 	private static String bookCancelCarList = "http://www.gjjx.com.cn/index.php?m=member&c=index&a=appointment&t=3";
 
+	/**
+	 * 禁约图片
+	 */
 	private static String forbiddenBookGif = "http://www.gjjx.com.cn/statics/images/gjjx/zyy_38.gif";
+
+	private static String canBookGif = "http://www.gjjx.com.cn/statics/images/gjjx/zyy_37.gif";
 
 	public static void init() {
 		client.getParams()
@@ -89,6 +94,13 @@ public class Main {
 			for (Element td : tds) {
 				if (td.html().contains(forbiddenBookGif)) {
 					objs[i][j] = "禁约";
+				} else if (td.html().contains(canBookGif)) {
+					Elements as = td.getElementsByTag("a");
+					String url = as.attr("href");
+					url = host + url;
+					objs[i][j] = url;
+				} else if (td.html().contains("无车")) {
+					objs[i][j] = "无车";
 				} else {
 					objs[i][j] = td.html();
 				}
