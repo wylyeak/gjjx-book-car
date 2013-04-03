@@ -10,8 +10,6 @@ import java.util.Scanner;
 
 import javax.imageio.ImageIO;
 
-import net.sf.json.JSONObject;
-
 import org.apache.http.Header;
 import org.apache.http.HttpException;
 import org.apache.http.HttpResponse;
@@ -75,14 +73,98 @@ public class Main {
 						"Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.22 (KHTML, like Gecko) Chrome/25.0.1364.172 Safari/537.22");
 	}
 
-	public static JSONObject getBookCarList() throws ClientProtocolException,
+	public static Object[][] getBookCarList() throws ClientProtocolException,
 			IOException {
 		HttpGet httpGet = new HttpGet(bookBaseCarList);
 		ResponseHandler<String> handler = new BasicResponseHandler();
 		String body = client.execute(httpGet, handler);
 		httpGet.abort();
+		Object[][] objs = parseBookBody(body);
+		for (int j = 1; j < 8; j++) {
+			for (int i = 2; i < 6; i++) {
+				if (objs[i][j] == null) {
+					continue;
+				}
+				objs[i][j] = parseBookCar(objs[0][j].toString(),
+						objs[1][j].toString(), objs[i][0].toString(),
+						objs[2][j], objs[i][j].toString());
+			}
+		}
+		return objs;
+	}
+
+	private static BookCar parseBookCar(String date, String weekDay,
+			String time, Object oldBookCar, String url)
+			throws ClientProtocolException, IOException {
+		BookCar bookCar = null;
+		if (oldBookCar instanceof BookCar) {
+			bookCar = (BookCar) oldBookCar;
+		} else {
+			bookCar = new BookCar();
+			bookCar.setDate(date);
+			bookCar.setWeekDay(weekDay);
+			bookCar.setBookUrl(url);
+		}
+		getCarTeacher(bookCar, time, url);
+		return bookCar;
+	}
+
+	private static void getCarTeacher(BookCar bookCar, String time, String url)
+			throws ClientProtocolException, IOException {
+		if (url.contains("禁约")) {
+			BookCarUrl bookCarUrl = new BookCarUrl();
+			bookCarUrl.setBookCar(bookCar);
+			bookCarUrl.setTime(time);
+			bookCarUrl.setBookStatus(EBookStatus.FORBIDDEN);
+			bookCar.getTimeCar().put(time, bookCarUrl);
+		} else if (url.contains("无车")) {
+			BookCarUrl bookCarUrl = new BookCarUrl();
+			bookCarUrl.setBookCar(bookCar);
+			bookCarUrl.setTime(time);
+			bookCarUrl.setBookStatus(EBookStatus.NOCAR);
+			bookCar.getTimeCar().put(time, bookCarUrl);
+		} else {
+			BookCarUrl bookCarUrl = new BookCarUrl();
+			bookCarUrl.setBookCar(bookCar);
+			bookCarUrl.setTime(time);
+			bookCarUrl.setBookStatus(EBookStatus.ENABLED);
+			HttpGet httpGet = new HttpGet(url);
+			ResponseHandler<String> handler = new BasicResponseHandler();
+			String body = client.execute(httpGet, handler);
+			httpGet.abort();
+			Document document = Jsoup.parse(body);
+			Elements elements = document.getElementsByClass("wyz_specific");
+			Elements trs = elements.get(0).getElementsByTag("tr");
+			trs.remove(0);
+			for (Element tr : trs) {
+				TeacherCar teacherCar = new TeacherCar();
+				Elements tds = tr.children();
+				teacherCar.setDate(tds.get(0).html());
+				teacherCar.setTime(tds.get(1).html());
+				teacherCar.setStopNo(tds.get(2).html());
+				teacherCar.setSiteNo(tds.get(4).html());
+				teacherCar.setTecherNo(tds.get(4).html());
+				String tmp = tds.get(5).children().get(0).attr("onclick");
+				tmp = tmp.replaceAll("bpk_js\\(", "").replaceAll("\\)", "")
+						.replaceAll("'", "");
+				String[] tmps = tmp.split(",");
+				String bookUrl = "http://www.gjjx.com.cn/index.php?m=member&c=index&a=bpk&id="
+						+ tmps[0]
+						+ "&yyrq="
+						+ tmps[1]
+						+ "&sd="
+						+ tmps[2]
+						+ "&cnbh=" + tmps[3] + "&traint=" + tmps[4];
+				teacherCar.setUrl(bookUrl);
+				bookCarUrl.getTeacherCar().put(teacherCar.getTecherNo(),
+						teacherCar);
+			}
+			bookCar.getTimeCar().put(time, bookCarUrl);
+		}
+	}
+
+	private static Object[][] parseBookBody(String body) {
 		Document document = Jsoup.parse(body);
-		JSONObject json = new JSONObject();
 		Element element = document.getElementById("u1tab");
 		Elements trs = element.getElementsByTag("tr");
 		trs.remove(0);
@@ -96,21 +178,19 @@ public class Main {
 					objs[i][j] = "禁约";
 				} else if (td.html().contains(canBookGif)) {
 					Elements as = td.getElementsByTag("a");
-					String url = as.attr("href");
+					String url = as.attr("href").trim();
 					url = host + url;
-					objs[i][j] = url;
+					objs[i][j] = url.trim();
 				} else if (td.html().contains("无车")) {
 					objs[i][j] = "无车";
 				} else {
-					objs[i][j] = td.html();
+					objs[i][j] = td.html().trim();
 				}
-				logger.info(td);
 				j++;
 			}
 			i++;
 		}
-		logger.info(trs);
-		return json;
+		return objs;
 	}
 
 	public static String getRandCode() throws ClientProtocolException,

@@ -1,11 +1,13 @@
 package org.wylyeak.gjjx;
 
+import java.util.HashMap;
 import java.util.Map;
 
 public class BookCar {
 	private String date;
-	private String day;
-	private Map<String, BookCarUrl> timeCar;
+	private String weekDay;
+	private String bookUrl;
+	private Map<String, BookCarUrl> timeCar = new HashMap<String, BookCarUrl>();
 
 	public String getDate() {
 		return date;
@@ -15,12 +17,20 @@ public class BookCar {
 		this.date = date;
 	}
 
-	public String getDay() {
-		return day;
+	public String getBookUrl() {
+		return bookUrl;
 	}
 
-	public void setDay(String day) {
-		this.day = day;
+	public void setBookUrl(String bookUrl) {
+		this.bookUrl = bookUrl;
+	}
+
+	public String getWeekDay() {
+		return weekDay;
+	}
+
+	public void setWeekDay(String weekDay) {
+		this.weekDay = weekDay;
 	}
 
 	public Map<String, BookCarUrl> getTimeCar() {
@@ -30,4 +40,13 @@ public class BookCar {
 	public void setTimeCar(Map<String, BookCarUrl> timeCar) {
 		this.timeCar = timeCar;
 	}
+
+	@Override
+	public String toString() {
+		return "BookCar [" + (date != null ? "date=" + date + ", " : "")
+				+ (weekDay != null ? "weekDay=" + weekDay + ", " : "")
+				+ (bookUrl != null ? "bookUrl=" + bookUrl + ", " : "")
+				+ (timeCar != null ? "timeCar=" + timeCar : "") + "]";
+	}
+
 }
