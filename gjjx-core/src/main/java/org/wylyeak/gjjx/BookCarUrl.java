@@ -1,6 +1,6 @@
 package org.wylyeak.gjjx;
 
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 public class BookCarUrl {
@@ -8,7 +8,7 @@ public class BookCarUrl {
 	private String bookUrl;
 	private String time;
 	private EBookStatus bookStatus;
-	private Map<String, TeacherCar> teacherCar = new HashMap<String, TeacherCar>();
+	private Map<String, TeacherCar> teacherCar = new LinkedHashMap<String, TeacherCar>();
 
 	public BookCar getBookCar() {
 		return bookCar;

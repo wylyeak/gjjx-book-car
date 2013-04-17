@@ -5,20 +5,19 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
+import java.util.Scanner;
 
 import org.apache.http.client.ClientProtocolException;
 
 public class AutoBookCarHandler implements Runnable {
 	private final BookCarProcesser processer;
-	private final String date;
-	private final String time;
+	private String date;
+	private String time;
+	private final Scanner cin = new Scanner(System.in);
 
-	public AutoBookCarHandler(String userName, String password,
-			String fileName, String date, String time)
+	public AutoBookCarHandler(String userName, String password, String fileName)
 			throws ClientProtocolException, IOException {
 		processer = new BookCarProcesser(userName, password, fileName);
-		this.date = date;
-		this.time = time;
 	}
 
 	@Override
@@ -27,9 +26,20 @@ public class AutoBookCarHandler implements Runnable {
 			if (processer.isLogin()) {
 				try {
 					Map<String, BookCar> map = processer.getBookCarList();
-					System.out.println(map.keySet());
+					if (date == null) {
+						for (BookCar bookCar : map.values()) {
+							System.out.print(bookCar.getDate()
+									+ bookCar.getWeekDay() + "\t");
+						}
+						date = cin.next();
+					}
 					BookCar bookCar = map.get(date);
 					if (bookCar != null) {
+						if (time == null) {
+							System.out.println(bookCar.getTimeCar().keySet()
+									+ ":");
+							time = cin.next();
+						}
 						BookCarUrl bookCarUrl = bookCar.getTimeCar().get(time);
 						if (bookCarUrl != null) {
 							if (bookCarUrl.getBookStatus() == EBookStatus.NOCAR) {

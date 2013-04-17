@@ -1,13 +1,13 @@
 package org.wylyeak.gjjx;
 
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 public class BookCar {
 	private String date;
 	private String weekDay;
 	private String bookUrl;
-	private Map<String, BookCarUrl> timeCar = new HashMap<String, BookCarUrl>();
+	private Map<String, BookCarUrl> timeCar = new LinkedHashMap<String, BookCarUrl>();
 
 	public String getDate() {
 		return date;

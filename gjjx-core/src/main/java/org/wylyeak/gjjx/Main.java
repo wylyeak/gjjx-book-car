@@ -22,26 +22,18 @@ public class Main {
 		optPassword.setRequired(true);
 		Option optFileName = new Option("jpg", true, "save code jpg");
 		optFileName.setRequired(true);
-		Option optDate = new Option("d", true, "book date");
-		optDate.setRequired(true);
-		Option optTime = new Option("t", true, "book time");
-		optTime.setRequired(true);
 		Options options = new Options();
 		options.addOption(optUsername);
 		options.addOption(optPassword);
 		options.addOption(optFileName);
-		options.addOption(optDate);
-		options.addOption(optTime);
 		CommandLineParser parser = new BasicParser();
 		CommandLine cmd = parser.parse(options, args);
 		String userName = cmd.getOptionValue("u");
 		String password = cmd.getOptionValue("p");
 		String fileName = cmd.getOptionValue("jpg");
-		String date = cmd.getOptionValue("d");
-		String time = cmd.getOptionValue("t");
 		if (userName != null && password != null) {
 			AutoBookCarHandler handler = new AutoBookCarHandler(userName,
-					password, fileName, date, time);
+					password, fileName);
 			Thread thread = new Thread(handler);
 			thread.start();
 		} else {
