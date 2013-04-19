@@ -9,11 +9,13 @@ import java.util.Scanner;
 
 import org.apache.http.client.ClientProtocolException;
 
+@SuppressWarnings("unchecked")
 public class AutoBookCarHandler implements Runnable {
 	private final BookCarProcesser processer;
 	private String date;
 	private String time;
 	private final Scanner cin = new Scanner(System.in);
+	private Integer index;
 
 	public AutoBookCarHandler(String userName, String password, String fileName)
 			throws ClientProtocolException, IOException {
@@ -25,7 +27,21 @@ public class AutoBookCarHandler implements Runnable {
 		while (true) {
 			if (processer.isLogin()) {
 				try {
-					Map<String, BookCar> map = processer.getBookCarList();
+					if (index == null) {
+						System.out.println("0 预约模拟训练\n1 预约基础道路训练   \n2 预约穿桩训练");
+						index = cin.nextInt();
+					}
+					Object obj = processer.getBookCarList(StaticData
+							.getBookUrl(index));
+					Map<String, BookCar> map = null;
+					if (obj instanceof String) {
+						System.out.println(obj);
+						Thread.sleep(5000);
+						continue;
+					} else {
+						map = (Map<String, BookCar>) obj;
+					}
+
 					if (date == null) {
 						for (BookCar bookCar : map.values()) {
 							System.out.print(bookCar.getDate()
@@ -57,7 +73,10 @@ public class AutoBookCarHandler implements Runnable {
 										bookCarUrl.getTeacherCar().values());
 								int index = new Random().nextInt(list.size());
 								TeacherCar teacherCar = list.get(index);
-								System.out.println("预定    " + teacherCar);
+								if (processer.bookTeacher(teacherCar)) {
+									System.out.println(teacherCar + "\t约车成功");
+									break;
+								}
 								break;
 							}
 						} else {

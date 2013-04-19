@@ -68,6 +68,13 @@ public class BookCarProcesser {
 		return elements.get(0).html();
 	}
 
+	private boolean isTips(String body) {
+		if (body.indexOf("提示信息") > 0) {
+			return true;
+		}
+		return false;
+	}
+
 	public boolean login() throws ClientProtocolException, IOException {
 		getRandCode();
 		getCode();
@@ -93,28 +100,33 @@ public class BookCarProcesser {
 		}
 	}
 
-	public Map<String, BookCar> getBookCarList()
-			throws ClientProtocolException, IOException {
-		HttpGet httpGet = new HttpGet(StaticData.bookBaseCarList);
+	public Object getBookCarList(String url) throws ClientProtocolException,
+			IOException {
+		HttpGet httpGet = new HttpGet(url);
 		ResponseHandler<String> handler = new BasicResponseHandler();
 		String body = client.execute(httpGet, handler);
 		httpGet.abort();
-		Object[][] objs = parseBookBody(body);
-		for (int j = 1; j < 8; j++) {
-			for (int i = 2; i < 6; i++) {
-				if (objs[i][j] == null) {
-					continue;
+		if (isTips(body)) {
+			String tips = getTips(body);
+			return tips;
+		} else {
+			Object[][] objs = parseBookBody(body);
+			for (int j = 1; j < 8; j++) {
+				for (int i = 2; i < 6; i++) {
+					if (objs[i][j] == null) {
+						continue;
+					}
+					objs[i][j] = parseBookCar(objs[0][j].toString(),
+							objs[1][j].toString(), objs[i][0].toString(),
+							objs[2][j], objs[i][j].toString());
 				}
-				objs[i][j] = parseBookCar(objs[0][j].toString(),
-						objs[1][j].toString(), objs[i][0].toString(),
-						objs[2][j], objs[i][j].toString());
 			}
+			Map<String, BookCar> map = new LinkedHashMap<String, BookCar>();
+			for (int i = 1; i < 8; i++) {
+				map.put(objs[0][i].toString(), (BookCar) objs[2][i]);
+			}
+			return map;
 		}
-		Map<String, BookCar> map = new LinkedHashMap<String, BookCar>();
-		for (int i = 1; i < 8; i++) {
-			map.put(objs[0][i].toString(), (BookCar) objs[2][i]);
-		}
-		return map;
 	}
 
 	private BookCar parseBookCar(String date, String weekDay, String time,
@@ -143,6 +155,24 @@ public class BookCarProcesser {
 		} else {
 			return false;
 		}
+	}
+
+	public boolean bookTeacher(TeacherCar teacherCar)
+			throws ClientProtocolException, IOException {
+		HttpGet httpGet = new HttpGet(teacherCar.getUrl());
+		ResponseHandler<String> handler = new BasicResponseHandler();
+		String body = client.execute(httpGet, handler);
+		httpGet.abort();
+		if (isTips(body)) {
+			String tip = getTips(body);
+			if (tip.indexOf("约车成功") >= 0) {
+				return true;
+			} else {
+				System.out.println(tip);
+				return false;
+			}
+		}
+		return false;
 	}
 
 	private Object[][] parseBookBody(String body) {
@@ -272,4 +302,5 @@ public class BookCarProcesser {
 	public boolean isLogin() {
 		return login;
 	}
+
 }

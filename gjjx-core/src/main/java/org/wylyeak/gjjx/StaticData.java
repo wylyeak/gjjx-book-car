@@ -34,6 +34,18 @@ public class StaticData {
 	 */
 	public static String bookSlalomCarList = "http://www.gjjx.com.cn/index.php?m=member&c=index&a=orderlist&traint=0";
 
+	public static String getBookUrl(int index) {
+		switch (index) {
+		case 0:
+			return bookSimulateList;
+		case 1:
+			return bookBaseCarList;
+		case 2:
+			return bookSlalomCarList;
+		}
+		throw new IllegalArgumentException("选择的不存在");
+	}
+
 	/**
 	 * 取消训练
 	 */
