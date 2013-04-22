@@ -5,6 +5,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -16,13 +17,14 @@ import org.apache.http.Header;
 import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.ClientProtocolException;
-import org.apache.http.client.HttpClient;
 import org.apache.http.client.ResponseHandler;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
+import org.apache.http.cookie.Cookie;
 import org.apache.http.impl.client.BasicResponseHandler;
 import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.impl.cookie.BasicClientCookie;
 import org.apache.http.message.BasicNameValuePair;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -30,7 +32,7 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
 public class BookCarProcesser {
-	private HttpClient client;
+	private DefaultHttpClient client;
 	private HttpResponse response;
 
 	private final String userName;
@@ -55,6 +57,15 @@ public class BookCarProcesser {
 				.setParameter(
 						"User-Agent",
 						"Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.22 (KHTML, like Gecko) Chrome/25.0.1364.172 Safari/537.22");
+	}
+
+	public void cookie() {
+		List<Cookie> list = client.getCookieStore().getCookies();
+		for (Cookie tmp : list) {
+			BasicClientCookie cookie = (BasicClientCookie) tmp;
+			cookie.setExpiryDate(new Date(new Date().getTime() + 3600 * 1000
+					* 24 * 10));
+		}
 	}
 
 	private void inputCode() {
@@ -102,6 +113,7 @@ public class BookCarProcesser {
 
 	public Object getBookCarList(String url) throws ClientProtocolException,
 			IOException {
+		cookie();
 		HttpGet httpGet = new HttpGet(url);
 		ResponseHandler<String> handler = new BasicResponseHandler();
 		String body = client.execute(httpGet, handler);
@@ -242,6 +254,7 @@ public class BookCarProcesser {
 
 	private void getCarTeacher(BookCar bookCar, String time, String url,
 			boolean getTeacher) throws ClientProtocolException, IOException {
+		time = StaticData.encodeTime(time);
 		if (url.contains("禁约")) {
 			BookCarUrl bookCarUrl = new BookCarUrl();
 			bookCarUrl.setBookCar(bookCar);

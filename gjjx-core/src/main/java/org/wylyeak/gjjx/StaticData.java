@@ -46,6 +46,17 @@ public class StaticData {
 		throw new IllegalArgumentException("选择的不存在");
 	}
 
+	public static String encodeTime(String time) {
+		if (time.equals("上午") || time.equals("1")) {
+			time = "1(上午)";
+		} else if (time.equals("下午") || time.equals("2")) {
+			time = "2(下午)";
+		} else if (time.equals("晚间") || time.equals("3")) {
+			time = "3(晚间)";
+		}
+		return time;
+	}
+
 	/**
 	 * 取消训练
 	 */

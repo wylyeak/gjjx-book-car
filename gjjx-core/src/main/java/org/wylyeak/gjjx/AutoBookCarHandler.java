@@ -44,21 +44,23 @@ public class AutoBookCarHandler implements Runnable {
 
 					if (date == null && time == null) {
 						for (BookCar bookCar : map.values()) {
-							System.out.print(bookCar.getDate()+"("
+							System.out.print(bookCar.getDate() + "("
 									+ bookCar.getWeekDay() + ")  ");
 						}
-						System.out.println("\n" + map.values().iterator().next().getTimeCar().keySet());
+						System.out.println("\n"
+								+ map.values().iterator().next().getTimeCar()
+										.keySet());
 						date = cin.next();
 						time = cin.next();
+						time = StaticData.encodeTime(time);
 					}
 					BookCar bookCar = map.get(date);
 					if (bookCar != null) {
 						BookCarUrl bookCarUrl = bookCar.getTimeCar().get(time);
 						if (bookCarUrl != null) {
 							if (bookCarUrl.getBookStatus() == EBookStatus.NOCAR) {
-								System.out
-										.println("date = " + date + "  time = "
-												+ time + "无车   睡眠6s继续刷");
+								System.out.println("date = " + date
+										+ "  time = " + time + "无车   睡眠6s继续刷");
 								Thread.sleep(StaticData.SleepTime);
 							} else if (bookCarUrl.getBookStatus() == EBookStatus.FORBIDDEN) {
 								System.out.println("date = " + date
@@ -77,7 +79,7 @@ public class AutoBookCarHandler implements Runnable {
 								break;
 							}
 						} else {
-							System.out.println("未找到日期,睡眠6s重试");
+							System.out.println("未找到时间,睡眠6s重试");
 							Thread.sleep(StaticData.SleepTime);
 						}
 					} else {
@@ -86,18 +88,43 @@ public class AutoBookCarHandler implements Runnable {
 					}
 				} catch (ClientProtocolException e) {
 					e.printStackTrace();
+					try {
+						Thread.sleep(StaticData.SleepTime);
+					} catch (InterruptedException e1) {
+						e1.printStackTrace();
+					}
 				} catch (IOException e) {
 					e.printStackTrace();
+					try {
+						Thread.sleep(StaticData.SleepTime);
+					} catch (InterruptedException e1) {
+						e1.printStackTrace();
+					}
 				} catch (InterruptedException e) {
 					e.printStackTrace();
+					try {
+						Thread.sleep(StaticData.SleepTime);
+					} catch (InterruptedException e1) {
+						e1.printStackTrace();
+					}
 				}
 			} else {
 				try {
 					processer.login();
 				} catch (ClientProtocolException e) {
 					e.printStackTrace();
+					try {
+						Thread.sleep(StaticData.SleepTime);
+					} catch (InterruptedException e1) {
+						e1.printStackTrace();
+					}
 				} catch (IOException e) {
 					e.printStackTrace();
+					try {
+						Thread.sleep(StaticData.SleepTime);
+					} catch (InterruptedException e1) {
+						e1.printStackTrace();
+					}
 				}
 			}
 		}
