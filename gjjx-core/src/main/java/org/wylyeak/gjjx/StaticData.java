@@ -61,6 +61,5 @@ public class StaticData {
 	 */
 	public static String canBookGif = "http://www.gjjx.com.cn/statics/images/gjjx/zyy_37.gif";
 
-	public static String timeArgs[] = { "07:00--08:30", "08:45--12:00",
-			"13:00--17:45", "18:15--21:15" };
+	public static final int SleepTime = 6000;
 }

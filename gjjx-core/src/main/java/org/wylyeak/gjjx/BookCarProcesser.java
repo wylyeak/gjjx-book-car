@@ -165,7 +165,7 @@ public class BookCarProcesser {
 		httpGet.abort();
 		if (isTips(body)) {
 			String tip = getTips(body);
-			if (tip.indexOf("约车成功") >= 0) {
+			if (tip.contains("约车成功")) {
 				return true;
 			} else {
 				System.out.println(tip);

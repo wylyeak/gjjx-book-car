@@ -36,33 +36,30 @@ public class AutoBookCarHandler implements Runnable {
 					Map<String, BookCar> map = null;
 					if (obj instanceof String) {
 						System.out.println(obj);
-						Thread.sleep(5000);
+						Thread.sleep(StaticData.SleepTime);
 						continue;
 					} else {
 						map = (Map<String, BookCar>) obj;
 					}
 
-					if (date == null) {
+					if (date == null && time == null) {
 						for (BookCar bookCar : map.values()) {
-							System.out.print(bookCar.getDate()
-									+ bookCar.getWeekDay() + "\t");
+							System.out.print(bookCar.getDate()+"("
+									+ bookCar.getWeekDay() + ")  ");
 						}
+						System.out.println("\n" + map.values().iterator().next().getTimeCar().keySet());
 						date = cin.next();
+						time = cin.next();
 					}
 					BookCar bookCar = map.get(date);
 					if (bookCar != null) {
-						if (time == null) {
-							System.out.println(bookCar.getTimeCar().keySet()
-									+ ":");
-							time = cin.next();
-						}
 						BookCarUrl bookCarUrl = bookCar.getTimeCar().get(time);
 						if (bookCarUrl != null) {
 							if (bookCarUrl.getBookStatus() == EBookStatus.NOCAR) {
 								System.out
 										.println("date = " + date + "  time = "
-												+ time + "无车   睡眠10分钟继续刷");
-
+												+ time + "无车   睡眠6s继续刷");
+								Thread.sleep(StaticData.SleepTime);
 							} else if (bookCarUrl.getBookStatus() == EBookStatus.FORBIDDEN) {
 								System.out.println("date = " + date
 										+ "  time = " + time + "禁约");
@@ -80,12 +77,12 @@ public class AutoBookCarHandler implements Runnable {
 								break;
 							}
 						} else {
-							System.out.println("未找到日期,睡眠30分钟重试");
-							Thread.sleep(1000);
+							System.out.println("未找到日期,睡眠6s重试");
+							Thread.sleep(StaticData.SleepTime);
 						}
 					} else {
-						System.out.println("未找到日期,睡眠30分钟重试");
-						Thread.sleep(1000);
+						System.out.println("未找到日期,睡眠6s重试");
+						Thread.sleep(StaticData.SleepTime);
 					}
 				} catch (ClientProtocolException e) {
 					e.printStackTrace();
