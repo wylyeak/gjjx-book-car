@@ -5,6 +5,8 @@ public class StaticData {
 	 * 登录
 	 */
 	public static String loginUrl = "http://www.gjjx.com.cn/index.php?m=member&c=index&a=login";
+
+	public static String logoutUrl = "http://www.gjjx.com.cn/index.php?m=member&c=index&a=logout";
 	/**
 	 * 用户中心
 	 */
@@ -12,7 +14,7 @@ public class StaticData {
 	/**
 	 * 验证码
 	 */
-	public static String codeUrl = "http://www.gjjx.com.cn/api.php?op=checkcode&code_len=4&font_size=14&width=84&height=24&font_color=&background=";
+	public static String codeUrl = "http://www.gjjx.com.cn/api.php?op=checkcode&code_len=2&font_size=100&width=300&height=300&font_color=&background=";
 	/**
 	 * 迷你首页
 	 */

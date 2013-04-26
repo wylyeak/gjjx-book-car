@@ -5,7 +5,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -21,11 +20,10 @@ import org.apache.http.client.ResponseHandler;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
-import org.apache.http.cookie.Cookie;
 import org.apache.http.impl.client.BasicResponseHandler;
 import org.apache.http.impl.client.DefaultHttpClient;
-import org.apache.http.impl.cookie.BasicClientCookie;
 import org.apache.http.message.BasicNameValuePair;
+import org.apache.http.params.CoreProtocolPNames;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -34,13 +32,12 @@ import org.jsoup.select.Elements;
 public class BookCarProcesser {
 	private DefaultHttpClient client;
 	private HttpResponse response;
-
 	private final String userName;
 	private final String password;
 	private final String fileName;
 	private boolean login;
 	private String randCode;
-	private String code;
+	private String code = "验证码";
 	private final Scanner cin = new Scanner(System.in);
 
 	public BookCarProcesser(String userName, String password, String fileName)
@@ -48,30 +45,29 @@ public class BookCarProcesser {
 		this.userName = userName;
 		this.password = password;
 		this.fileName = fileName;
-		init();
-	}
-
-	public void init() {
 		client = new DefaultHttpClient();
 		client.getParams()
 				.setParameter(
-						"User-Agent",
+						CoreProtocolPNames.USER_AGENT,
 						"Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.22 (KHTML, like Gecko) Chrome/25.0.1364.172 Safari/537.22");
-		login = false;
 	}
 
-	public void cookie() {
-		List<Cookie> list = client.getCookieStore().getCookies();
-		for (Cookie tmp : list) {
-			BasicClientCookie cookie = (BasicClientCookie) tmp;
-			cookie.setExpiryDate(new Date(new Date().getTime() + 3600 * 1000
-					* 24 * 10));
+	public void loginOut() throws ClientProtocolException, IOException {
+		HttpGet httpGet = new HttpGet(StaticData.logoutUrl);
+		ResponseHandler<String> handler = new BasicResponseHandler();
+		String body = client.execute(httpGet, handler);
+		httpGet.abort();
+		if (body.contains("退出成功")) {
+			System.out.println("退出成功");
+			login = false;
 		}
 	}
 
 	private void inputCode() {
-		System.out.print("输入验证码:");
-		code = cin.next();
+		if (code == null) {
+			System.out.print("输入验证码:");
+			code = cin.next();
+		}
 	}
 
 	private String getTips(String body) {
@@ -103,8 +99,9 @@ public class BookCarProcesser {
 		ResponseHandler<String> handler = new BasicResponseHandler();
 		String body = client.execute(httpost, handler);
 		httpost.abort();
-		if (body.indexOf("登陆成功") > 0 && valitate()) {
+		if (body.indexOf("登陆成功") >= 0 && valitate()) {
 			login = true;
+			System.out.println("登录成功，开始刷车");
 			return true;
 		} else {
 			System.out.println(getTips(body));
@@ -114,7 +111,6 @@ public class BookCarProcesser {
 
 	public Object getBookCarList(String url) throws ClientProtocolException,
 			IOException {
-		cookie();
 		HttpGet httpGet = new HttpGet(url);
 		ResponseHandler<String> handler = new BasicResponseHandler();
 		String body = client.execute(httpGet, handler);
@@ -223,13 +219,16 @@ public class BookCarProcesser {
 	}
 
 	public String getRandCode() throws ClientProtocolException, IOException {
-		HttpGet httpGet = new HttpGet(StaticData.topIndexUrl);
-		ResponseHandler<String> handler = new BasicResponseHandler();
-		String body = client.execute(httpGet, handler);
-		Document document = Jsoup.parse(body);
-		Element element = document.getElementById("randcode");
-		randCode = element.attr("value");
-		httpGet.abort();
+		try {
+			HttpGet httpGet = new HttpGet(StaticData.topIndexUrl);
+			ResponseHandler<String> handler = new BasicResponseHandler();
+			String body = client.execute(httpGet, handler);
+			Document document = Jsoup.parse(body);
+			Element element = document.getElementById("randcode");
+			randCode = element.attr("value");
+			httpGet.abort();
+		} catch (Exception e) {
+		}
 		return randCode;
 	}
 
