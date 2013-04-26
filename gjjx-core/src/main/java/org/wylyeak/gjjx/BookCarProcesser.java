@@ -48,15 +48,16 @@ public class BookCarProcesser {
 		this.userName = userName;
 		this.password = password;
 		this.fileName = fileName;
-		initClient();
+		init();
 	}
 
-	private void initClient() {
+	public void init() {
 		client = new DefaultHttpClient();
 		client.getParams()
 				.setParameter(
 						"User-Agent",
 						"Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.22 (KHTML, like Gecko) Chrome/25.0.1364.172 Safari/537.22");
+		login = false;
 	}
 
 	public void cookie() {

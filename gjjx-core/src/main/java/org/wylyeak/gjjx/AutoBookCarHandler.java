@@ -35,9 +35,14 @@ public class AutoBookCarHandler implements Runnable {
 							.getBookUrl(index));
 					Map<String, BookCar> map = null;
 					if (obj instanceof String) {
-						System.out.println(obj);
-						Thread.sleep(StaticData.SleepTime);
-						continue;
+						if(obj.equals("您的登陆已超时请返回登陆")){
+							processer.init();
+							continue;
+						}else{
+							System.out.println(obj);
+							Thread.sleep(StaticData.SleepTime);
+							continue;
+						}
 					} else {
 						map = (Map<String, BookCar>) obj;
 					}
