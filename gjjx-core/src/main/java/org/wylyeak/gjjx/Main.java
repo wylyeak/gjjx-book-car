@@ -9,13 +9,11 @@ import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.apache.http.client.ClientProtocolException;
-import org.apache.log4j.xml.DOMConfigurator;
 
 public class Main {
 
 	public static void main(String[] args) throws ParseException,
 			ClientProtocolException, IOException {
-		DOMConfigurator.configure("config/log4j.xml");
 		Option optUsername = new Option("u", true, "login username");
 		optUsername.setRequired(true);
 		Option optPassword = new Option("p", true, "login password");
