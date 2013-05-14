@@ -37,7 +37,7 @@ public class BookCarProcesser {
 	private final String fileName;
 	private boolean login;
 	private String randCode;
-	private String code = "验证码";
+	private String code;
 	private final Scanner cin = new Scanner(System.in);
 
 	public BookCarProcesser(String userName, String password, String fileName)
@@ -63,13 +63,6 @@ public class BookCarProcesser {
 		}
 	}
 
-	private void inputCode() {
-		if (code == null) {
-			System.out.print("输入验证码:");
-			code = cin.next();
-		}
-	}
-
 	private String getTips(String body) {
 		Document document = Jsoup.parse(body);
 		Elements elements = document.getElementsByClass("guery");
@@ -86,27 +79,32 @@ public class BookCarProcesser {
 	public boolean login() throws ClientProtocolException, IOException {
 		getRandCode();
 		getCode();
-		inputCode();
-		HttpPost httpost = new HttpPost(StaticData.loginUrl);
-		List<NameValuePair> nvps = new ArrayList<NameValuePair>();
-		nvps.add(new BasicNameValuePair("username", userName));
-		nvps.add(new BasicNameValuePair("password", password));
-		nvps.add(new BasicNameValuePair("code", code));
-		nvps.add(new BasicNameValuePair("dosubmit", ""));
-		nvps.add(new BasicNameValuePair("searchmem", "输入身份证号查询考试信息"));
-		nvps.add(new BasicNameValuePair("randcode", randCode));
-		httpost.setEntity(new UrlEncodedFormEntity(nvps, "UTF-8"));
-		ResponseHandler<String> handler = new BasicResponseHandler();
-		String body = client.execute(httpost, handler);
-		httpost.abort();
-		if (body.indexOf("登陆成功") >= 0 && valitate()) {
-			login = true;
-			System.out.println("登录成功，开始刷车");
-			return true;
-		} else {
-			System.out.println(getTips(body));
-			return false;
+		for (int i = 0; i < StaticData.chs.length; i++) {
+			for (int j = 0; j < StaticData.chs.length; j++) {
+				System.out.println(i + "\t" + j);
+				code = "" + StaticData.chs[i] + StaticData.chs[j];
+				HttpPost httpost = new HttpPost(StaticData.loginUrl);
+				List<NameValuePair> nvps = new ArrayList<NameValuePair>();
+				nvps.add(new BasicNameValuePair("username", userName));
+				nvps.add(new BasicNameValuePair("password", password));
+				nvps.add(new BasicNameValuePair("code", code));
+				nvps.add(new BasicNameValuePair("dosubmit", ""));
+				nvps.add(new BasicNameValuePair("searchmem", "输入身份证号查询考试信息"));
+				nvps.add(new BasicNameValuePair("randcode", randCode));
+				httpost.setEntity(new UrlEncodedFormEntity(nvps, "UTF-8"));
+				ResponseHandler<String> handler = new BasicResponseHandler();
+				String body = client.execute(httpost, handler);
+				httpost.abort();
+				if (body.indexOf("登陆成功") >= 0 && valitate()) {
+					login = true;
+					System.out.println("登录成功，开始刷车");
+					return true;
+				} else {
+					// System.out.println(getTips(body));
+				}
+			}
 		}
+		return false;
 	}
 
 	public Object getBookCarList(String url) throws ClientProtocolException,
