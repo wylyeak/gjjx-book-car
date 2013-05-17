@@ -68,7 +68,7 @@ public class StaticData {
 	/**
 	 * 禁约图片
 	 */
-	public static String forbiddenBookGif = "http://www.gjjx.com.cn/statics/images/gjjx/zyy_38.gif";
+	public static String forbiddenBookGif = "http://www.gjjx.com.cn/statics/images/gjjx/zyy_38";
 
 	/**
 	 * 可约图片
