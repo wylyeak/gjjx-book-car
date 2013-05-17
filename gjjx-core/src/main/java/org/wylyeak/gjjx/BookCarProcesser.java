@@ -8,7 +8,6 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Scanner;
 
 import javax.imageio.ImageIO;
 
@@ -38,7 +37,6 @@ public class BookCarProcesser {
 	private boolean login;
 	private String randCode;
 	private String code;
-	private final Scanner cin = new Scanner(System.in);
 
 	public BookCarProcesser(String userName, String password, String fileName)
 			throws ClientProtocolException, IOException {
@@ -81,8 +79,8 @@ public class BookCarProcesser {
 		getCode();
 		for (int i = 0; i < StaticData.chs.length; i++) {
 			for (int j = 0; j < StaticData.chs.length; j++) {
-				System.out.println(i + "\t" + j);
 				code = "" + StaticData.chs[i] + StaticData.chs[j];
+				// System.out.println(code);
 				HttpPost httpost = new HttpPost(StaticData.loginUrl);
 				List<NameValuePair> nvps = new ArrayList<NameValuePair>();
 				nvps.add(new BasicNameValuePair("username", userName));
@@ -186,7 +184,9 @@ public class BookCarProcesser {
 		Document document = Jsoup.parse(body);
 		Element element = document.getElementById("u1tab");
 		Elements trs = element.getElementsByTag("tr");
+		// System.out.println(trs);
 		trs.remove(0);
+		// System.out.println(trs);
 		Object[][] objs = new Object[6][8];
 		int i = 0;
 		for (Element tr : trs) {
@@ -199,7 +199,8 @@ public class BookCarProcesser {
 					Elements as = td.getElementsByTag("a");
 					String url = as.attr("href").trim();
 					url = StaticData.host + url;
-					objs[i][j] = url.trim();
+					objs[i][j] = url.trim().replaceAll("&amp;", "&")
+							.replaceAll(" &", "&");
 				} else if (td.html().contains("无车")) {
 					objs[i][j] = "无车";
 				} else {
@@ -294,7 +295,7 @@ public class BookCarProcesser {
 			teacherCar.setSiteNo(tds.get(4).html());
 			teacherCar.setTecherNo(tds.get(4).html());
 			String tmp = tds.get(5).children().get(0).attr("onclick");
-			tmp = tmp.replaceAll("bpk_js\\(", "").replaceAll("\\)", "")
+			tmp = tmp.replaceAll("bpk_add\\(", "").replaceAll("\\)", "")
 					.replaceAll("'", "");
 			String[] tmps = tmp.split(",");
 			String bookUrl = "http://www.gjjx.com.cn/index.php?m=member&c=index&a=bpk&id="
@@ -303,7 +304,12 @@ public class BookCarProcesser {
 					+ tmps[1]
 					+ "&sd="
 					+ tmps[2]
-					+ "&cnbh=" + tmps[3] + "&traint=" + tmps[4];
+					+ "&cnbh="
+					+ tmps[3]
+					+ "&traint="
+					+ tmps[4]
+					+ "&add="
+					+ tmps[5];
 			teacherCar.setUrl(bookUrl);
 			bookCarUrl.getTeacherCar()
 					.put(teacherCar.getTecherNo(), teacherCar);

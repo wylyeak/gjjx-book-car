@@ -2,12 +2,14 @@ package org.wylyeak.gjjx;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
 import java.util.Scanner;
 
 import org.apache.http.client.ClientProtocolException;
+import org.wylyeak.gjjx.util.TimeUtils;
 
 @SuppressWarnings("unchecked")
 public class AutoBookCarHandler implements Runnable {
@@ -29,8 +31,7 @@ public class AutoBookCarHandler implements Runnable {
 				if (processer.isLogin()) {
 					try {
 						if (index == null) {
-							System.out
-									.println("0 预约模拟训练\n1 预约基础道路训练   \n2 预约穿桩训练");
+							System.out.println("1 预约基础道路训练   \n2 预约穿桩训练");
 							index = cin.nextInt();
 						}
 						Object obj = processer.getBookCarList(StaticData
@@ -94,8 +95,21 @@ public class AutoBookCarHandler implements Runnable {
 								Thread.sleep(StaticData.SleepTime);
 							}
 						} else {
-							System.out.println("未找到日期,睡眠6s重试");
-							Thread.sleep(StaticData.SleepTime);
+							Date now = new Date();
+							Date sleepDate = TimeUtils.parseStr(
+									TimeUtils.getDayAfter(now, 0) + " 06:00",
+									TimeUtils.YYYY_MM_DD_HH_MM);
+							if (now.after(sleepDate)) {
+								System.out.println("超过 06 点  依然没有时间  继续刷");
+								Thread.sleep(StaticData.SleepTime);
+							} else {
+								System.out
+										.println("未找到日期,睡眠到06:00 开始刷  "
+												+ (sleepDate.getTime() - now
+														.getTime()));
+								Thread.sleep(sleepDate.getTime()
+										- now.getTime());
+							}
 						}
 					} catch (ClientProtocolException e) {
 						e.printStackTrace();

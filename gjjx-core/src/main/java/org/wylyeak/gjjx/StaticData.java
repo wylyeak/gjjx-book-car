@@ -26,11 +26,12 @@ public class StaticData {
 	/**
 	 * 预约模拟训练
 	 */
+	@Deprecated
 	public static String bookSimulateList = "http://www.gjjx.com.cn/index.php?m=member&c=index&a=orderlist&traint=2";
 	/**
 	 * 预约基础＆道路
 	 */
-	public static String bookBaseCarList = "http://www.gjjx.com.cn/index.php?m=member&c=index&a=orderlist&traint=1";
+	public static String bookBaseCarList = "http://www.gjjx.com.cn/index.php?m=member&c=indexdeg&a=orderlist&traint=1&datatime=1";
 	/**
 	 * 预约穿桩训练
 	 */
